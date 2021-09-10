@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_shop_app/models/product.dart';
+import 'package:the_shop_app/providers/product.dart';
 import 'package:the_shop_app/providers/products_provider.dart';
 import 'package:the_shop_app/widgets/product_item.dart';
 
@@ -19,10 +19,15 @@ class ProductsGrid extends StatelessWidget {
         mainAxisSpacing: 10,
       ),
       itemBuilder: (ctx, i) {
-        return ProductItem(
-          id: products[i].id,
-          imageUrl: products[i].imageUrl,
-          title: products[i].title,
+        return ChangeNotifierProvider.value(
+          // whenever in a list/grid use this .value syntax of provider
+          // or whenever u r using an already existing object .. in this case products[i]
+          value: products[i],
+          child: ProductItem(
+              // id: products[i].id,
+              // imageUrl: products[i].imageUrl,
+              // title: products[i].title,
+              ),
         );
       },
     );
