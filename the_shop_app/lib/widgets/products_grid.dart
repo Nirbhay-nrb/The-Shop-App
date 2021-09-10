@@ -22,6 +22,7 @@ class ProductsGrid extends StatelessWidget {
         return ChangeNotifierProvider.value(
           // whenever in a list/grid use this .value syntax of provider
           // or whenever u r using an already existing object .. in this case products[i]
+          // for new objects (like the one in main.dart) use the create method
           value: products[i],
           child: ProductItem(
               // id: products[i].id,
