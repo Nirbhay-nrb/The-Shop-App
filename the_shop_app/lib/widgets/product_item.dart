@@ -11,7 +11,7 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context);
+    final product = Provider.of<Product>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -29,14 +29,19 @@ class ProductItem extends StatelessWidget {
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
-          leading: IconButton(
-            onPressed: () {
-              product.toggleFavoriteStatus();
-            },
-            icon: product.isFavorite
-                ? Icon(Icons.favorite)
-                : Icon(Icons.favorite_border),
-            color: Theme.of(context).accentColor,
+          leading: Consumer<Product>(
+            builder: (ctx, product, _) => IconButton(
+              // the child property is used to store a widget which does not gets rebuild when the data is changed
+              // u can use the child property inside us builder to give a widget which does not rebuild
+              // incase u dont have any child property then just give an underscore(_)
+              onPressed: () {
+                product.toggleFavoriteStatus();
+              },
+              icon: product.isFavorite
+                  ? Icon(Icons.favorite)
+                  : Icon(Icons.favorite_border),
+              color: Theme.of(context).accentColor,
+            ),
           ),
           title: Text(
             product.title,
