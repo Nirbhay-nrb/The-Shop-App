@@ -29,10 +29,12 @@ class ProductItem extends StatelessWidget {
         ),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
+          // consumer is used to make a part of the widget tree to listen to changes and rebuild where as majority
+          // of the widget tree does not rebuilds
           leading: Consumer<Product>(
             builder: (ctx, product, _) => IconButton(
               // the child property is used to store a widget which does not gets rebuild when the data is changed
-              // u can use the child property inside us builder to give a widget which does not rebuild
+              // u can use the child property inside a builder to give a widget which does not rebuild
               // incase u dont have any child property then just give an underscore(_)
               onPressed: () {
                 product.toggleFavoriteStatus();

@@ -37,6 +37,10 @@ class Products with ChangeNotifier {
     ),
   ];
 
+  List<Product> get favItems {
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
+  }
+
   List<Product> get items {
     return [..._items]; // spread operator - returns a copy of the object
   }
