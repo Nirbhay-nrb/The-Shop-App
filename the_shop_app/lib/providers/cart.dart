@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class CartItem {
-  final String id;
+  final String id; // cartItemID : different then productID
   final String title;
   final double price;
   final int quantity;
@@ -15,9 +15,31 @@ class CartItem {
 }
 
 class Cart with ChangeNotifier {
-  Map<String, CartItem> _items;
+  Map<String, CartItem> _items = {};
   Map<String, CartItem> get items {
     return {..._items};
+  }
+
+  int get itemCount {
+    // returns the number of different items(not the quantity of each item)
+    return _items.length;
+  }
+
+  int get itemQuantityCount {
+    // return the total quantity of all item in the cart
+    var quantity = 0;
+    _items.forEach((key, cartIten) {
+      quantity += cartIten.quantity;
+    });
+    return quantity;
+  }
+
+  double get totalAmount {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
   }
 
   void addItem(String productId, double price, String title) {
@@ -42,5 +64,6 @@ class Cart with ChangeNotifier {
         ),
       );
     }
+    notifyListeners();
   }
 }
