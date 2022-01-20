@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_shop_app/providers/cart.dart' show Cart;
+import 'package:the_shop_app/providers/orders.dart';
 import 'package:the_shop_app/widgets/cart_item.dart';
 //this will only import the Cart class not the CartItem class to prevent the same class name clash
 
@@ -29,7 +30,7 @@ class CartScreen extends StatelessWidget {
                   Spacer(),
                   Chip(
                     label: Text(
-                      '\$${cart.totalAmount}',
+                      '\$${cart.totalAmount.toStringAsFixed(2)}', // 2 decimal points
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -37,7 +38,11 @@ class CartScreen extends StatelessWidget {
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Provider.of<Orders>(context, listen: false).addOrder(
+                          cart.items.values.toList(), cart.totalAmount);
+                      cart.clearCart();
+                    },
                     child: Text('ORDER NOW'),
                     textColor: Theme.of(context).primaryColor,
                   ),
