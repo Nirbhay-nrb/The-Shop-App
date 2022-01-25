@@ -34,11 +34,38 @@ class CartItem extends StatelessWidget {
         ),
       ),
       direction: DismissDirection.endToStart, // only for right to left
+      confirmDismiss: (direction) {
+        // confirmDismiss needs a Future<bool> return value
+        // showDialog return a Future<bool> value only
+        // but now we need to specify if it is true or false
+        // hence we specify that while popping the alertDialog as shown below
+        return showDialog(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              title: Text('Are you sure?'),
+              content: Text('Do you want to remove the item from the cart?'),
+              actions: [
+                TextButton(
+                  child: Text('No'),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(false);
+                  },
+                ),
+                TextButton(
+                  child: Text('Yes'),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(true);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
       onDismissed: (direction) {
         // you can do different things based on the direction
-        print(Provider.of<Cart>(context, listen: false).items);
         Provider.of<Cart>(context, listen: false).removeItem(productId);
-        print(Provider.of<Cart>(context, listen: false).items);
       },
       child: Card(
         margin: EdgeInsets.symmetric(
