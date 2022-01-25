@@ -24,6 +24,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   decoration: InputDecoration(labelText: 'Title'),
                   textInputAction: TextInputAction.next,
                 ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Price'),
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.number,
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Description'),
+                  maxLines: 3,
+                  keyboardType: TextInputType.multiline,
+                ),
               ],
             ),
           ),
