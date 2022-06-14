@@ -45,12 +45,27 @@ class Products with ChangeNotifier {
     return [..._items]; // spread operator - returns a copy of the object
   }
 
-  void addProduct(Product value) {
-    _items.add(value);
+  void addProduct(Product product) {
+    final newProduct = Product(
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      id: DateTime.now()
+          .toString(), // until we have a better unique id from the backend
+    );
+    _items.add(newProduct);
+    // _items.insert(0,newProduct); // at the start of the list
     notifyListeners();
   }
 
   Product findById(String id) {
     return _items.firstWhere((element) => element.id == id);
+  }
+
+  void updateProduct(String id, Product newProduct) {
+    final prodIndex = _items.indexWhere((element) => id == element.id);
+    _items[prodIndex] = newProduct;
+    notifyListeners();
   }
 }
