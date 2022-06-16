@@ -6,6 +6,8 @@ import 'package:the_shop_app/widgets/app_drawer.dart';
 import 'package:the_shop_app/widgets/badge.dart';
 import 'package:the_shop_app/widgets/products_grid.dart';
 
+import '../providers/products.dart';
+
 enum FilterOptions {
   Favorites,
   All,
@@ -18,6 +20,41 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   bool showFavoritesOnly = false;
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void initState() {
+    // Provider.of<Products>(context).fetchAndSetProducts();
+    // you cannot run things with context in init state
+    // for that use didChangeDependencies
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // this also runs before the build is created
+    // and it supports the use of context
+    // but this will however run multiple times,
+    //so to avoid that maintain a variable to run this only once
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      // we cannot use async in functions such as initState and didChangeDependencies
+      // so to implement a loaded use 'then' function
+      Provider.of<Products>(context, listen: false).fetchAndSetProducts().then(
+        (_) {
+          setState(() {
+            _isLoading = false;
+          });
+        },
+      );
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +101,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(showFavoritesOnly),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ProductsGrid(showFavoritesOnly),
     );
   }
 }
