@@ -116,14 +116,18 @@ class Products with ChangeNotifier {
     _items.removeAt(indexOfProd);
     notifyListeners();
     // deleting the item from server
-    final response = await http.delete(url);
-    // in case we have an error then we reinsert the item into the list
-    if (response.statusCode >= 400) {
+    try {
+      final response = await http.delete(url);
+      // in case we have an error then we reinsert the item into the list
+      if (response.statusCode >= 400) {
+        throw HttpException('Could not delete product.');
+      }
+    } catch (e) {
+      print(e);
       _items.insert(indexOfProd, prod);
       notifyListeners();
-      throw HttpException('Could not delete product.');
+      throw e;
     }
-    // in case there is no error then we dont need the copy of the item anymore
     prod = null;
   }
 }

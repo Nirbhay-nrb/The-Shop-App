@@ -12,6 +12,7 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = Scaffold.of(context);
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
     return ClipRRect(
@@ -38,8 +39,13 @@ class ProductItem extends StatelessWidget {
               // the child property is used to store a widget which does not gets rebuild when the data is changed
               // u can use the child property inside a builder to give a widget which does not rebuild
               // incase u dont have any child property then just give an underscore(_)
-              onPressed: () {
-                product.toggleFavoriteStatus();
+              onPressed: () async {
+                try {
+                  await product.toggleFavoriteStatus();
+                } catch (e) {
+                  scaffold.showSnackBar(
+                      SnackBar(content: Text('Couldn\'t update!')));
+                }
               },
               icon: product.isFavorite
                   ? Icon(Icons.favorite)
