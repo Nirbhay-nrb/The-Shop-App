@@ -84,9 +84,24 @@ class Products with ChangeNotifier {
     return _items.firstWhere((element) => element.id == id);
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((element) => id == element.id);
-    _items[prodIndex] = newProduct;
+    final url = Uri.parse(
+        'https://shop-app-99f95-default-rtdb.firebaseio.com/products/$id.json');
+    try {
+      // patch request merges the incoming data with the existing data
+      // and also overwrites the data it already has for a particular key
+      await http.patch(url,
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price,
+          }));
+      _items[prodIndex] = newProduct;
+    } catch (e) {
+      print(e);
+    }
     notifyListeners();
   }
 

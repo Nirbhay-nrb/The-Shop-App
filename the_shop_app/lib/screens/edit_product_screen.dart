@@ -101,13 +101,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
     if (_editedProduct.id != null) {
       // a product will only have an ID if it is being edited
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
-      // editing the item
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.pop(context);
     } else {
       // adding a new product as the id is null
       try {
@@ -129,13 +124,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.pop(context);
       }
     }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.pop(context);
   }
 
   @override
