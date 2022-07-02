@@ -19,9 +19,12 @@ class Products with ChangeNotifier {
     return [..._items]; // spread operator - returns a copy of the object
   }
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    // [] on arguments they are optional and in case they are not given false will be the default value
+    final filterString =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
     var url = Uri.parse(
-        'https://shop-app-99f95-default-rtdb.firebaseio.com/products.json?auth=$authToken');
+        'https://shop-app-99f95-default-rtdb.firebaseio.com/products.json?auth=$authToken&$filterString');
     try {
       final response = await http.get(url);
       print(json.decode(response.body));
@@ -72,6 +75,7 @@ class Products with ChangeNotifier {
             'description': product.description,
             'price': product.price,
             'imageUrl': product.imageUrl,
+            'creatorId': userId,
           },
         ),
       );
