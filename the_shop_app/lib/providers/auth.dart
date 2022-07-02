@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +10,7 @@ class Auth with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
   String _userId;
+  Timer _authTimer;
 
   bool get isAuth {
     // if we have a token which is not expired then we return true
@@ -60,6 +62,7 @@ class Auth with ChangeNotifier {
       // firebase returns the expiry duration in seconds,
       // so we need to calculate the expiry time by
       // adding the given duration to the current time
+      _autoLogout();
       notifyListeners();
     } catch (e) {
       throw e;
@@ -76,5 +79,29 @@ class Auth with ChangeNotifier {
     return _authenticate(email, password, 'signInWithPassword');
     // as there is only one change in signin and signup (thats the urlSegment)
     // we combine both the functions into one
+  }
+
+  void logout() {
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
+    notifyListeners();
+  }
+
+  void _autoLogout() {
+    // set a timer till the token expires and then autologout
+    if (_authTimer != null) {
+      // if a timer already exists then we should cancel that before putting a new one
+      _authTimer.cancel();
+    }
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(
+      Duration(seconds: timeToExpiry),
+      logout,
+    );
   }
 }
