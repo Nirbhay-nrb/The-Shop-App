@@ -42,8 +42,9 @@ class ProductItem extends StatelessWidget {
               // incase u dont have any child property then just give an underscore(_)
               onPressed: () async {
                 try {
-                  final token = Provider.of<Auth>(context, listen: false).token;
-                  await product.toggleFavoriteStatus(token);
+                  final authData = Provider.of<Auth>(context, listen: false);
+                  await product.toggleFavoriteStatus(
+                      authData.token, authData.userId);
                 } catch (e) {
                   scaffold.showSnackBar(
                       SnackBar(content: Text('Couldn\'t update!')));

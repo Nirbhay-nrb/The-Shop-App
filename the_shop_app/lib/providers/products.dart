@@ -8,7 +8,8 @@ import 'package:http/http.dart' as http;
 class Products with ChangeNotifier {
   List<Product> _items = [];
   final String authToken;
-  Products(this.authToken, this._items); // constructor
+  final String userId;
+  Products(this.authToken, this.userId, this._items); // constructor
 
   List<Product> get favItems {
     return _items.where((prodItem) => prodItem.isFavorite).toList();
@@ -19,7 +20,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final url = Uri.parse(
+    var url = Uri.parse(
         'https://shop-app-99f95-default-rtdb.firebaseio.com/products.json?auth=$authToken');
     try {
       final response = await http.get(url);
@@ -28,6 +29,12 @@ class Products with ChangeNotifier {
       if (data == null) {
         return;
       }
+      url = Uri.parse(
+        'https://shop-app-99f95-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken',
+      );
+      final favoriteResponse = await http.get(url);
+      // Map with key as product id and value as isFavorite status
+      final favData = json.decode(favoriteResponse.body);
       final List<Product> loadedProducts = [];
       data.forEach(
         (prodId, prodData) {
@@ -36,7 +43,8 @@ class Products with ChangeNotifier {
               id: prodId,
               title: prodData['title'],
               description: prodData['description'],
-              isFavorite: prodData['isFavorite'],
+              isFavorite: favData == null ? false : favData[prodId] ?? false,
+              // ?? is null operator, i.e. if null it will take the value after ?? i.e. false
               price: prodData['price'],
               imageUrl: prodData['imageUrl'],
             ),
@@ -64,7 +72,6 @@ class Products with ChangeNotifier {
             'description': product.description,
             'price': product.price,
             'imageUrl': product.imageUrl,
-            'isFavorite': product.isFavorite,
           },
         ),
       );

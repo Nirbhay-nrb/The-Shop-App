@@ -27,9 +27,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, Products>(
           update: (ctx, auth, previousProducts) => Products(
             auth.token,
+            auth.userId,
             previousProducts == null ? [] : previousProducts.items,
           ),
-          create: (ctx) => Products('', []),
+          create: (ctx) => Products('', '', []),
         ),
         // proxy provider is used to rebuild a provider class using a previous provider
         // in this case we are rebuilding the products class by auth provider
