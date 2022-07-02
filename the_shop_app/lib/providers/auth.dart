@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:the_shop_app/models/http_exception.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
   final String _apiKey = 'AIzaSyDx8HnTYsYn_oaT2r5NySAaiBRMCa_G9v0';
@@ -64,9 +65,41 @@ class Auth with ChangeNotifier {
       // adding the given duration to the current time
       _autoLogout();
       notifyListeners();
+      // storing the login data onto the device
+      final prefs = await SharedPreferences.getInstance();
+      final userData = json.encode({
+        'token': _token,
+        'userId': _userId,
+        'expiryDate': _expiryDate.toIso8601String(),
+      }); // json is esentially a string so we are storing the json string on the device
+      prefs.setString('userData', userData);
     } catch (e) {
       throw e;
     }
+  }
+
+  Future<bool> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      return false;
+    }
+    final data =
+        json.decode(prefs.getString('userData')) as Map<String, Object>;
+    // Object means different kinds of values
+
+    // checking if the token is valid or not (with expiry date)
+    final expiryDate = DateTime.parse(data['expiryDate']);
+    if (expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+
+    // we have a valid token and we can auto login
+    _token = data['token'];
+    _userId = data['userId'];
+    _expiryDate = expiryDate;
+    notifyListeners();
+    _autoLogout();
+    return true;
   }
 
   Future<void> signup(String email, String password) async {
@@ -81,7 +114,7 @@ class Auth with ChangeNotifier {
     // we combine both the functions into one
   }
 
-  void logout() {
+  Future<void> logout() async {
     _token = null;
     _userId = null;
     _expiryDate = null;
@@ -90,6 +123,9 @@ class Auth with ChangeNotifier {
       _authTimer = null;
     }
     notifyListeners();
+    // clearing the device storage
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
   }
 
   void _autoLogout() {
