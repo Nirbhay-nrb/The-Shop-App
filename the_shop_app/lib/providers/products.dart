@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 
 class Products with ChangeNotifier {
   List<Product> _items = [];
+  final String authToken;
+  Products(this.authToken, this._items); // constructor
 
   List<Product> get favItems {
     return _items.where((prodItem) => prodItem.isFavorite).toList();
@@ -18,7 +20,7 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     final url = Uri.parse(
-        'https://shop-app-99f95-default-rtdb.firebaseio.com/products.json');
+        'https://shop-app-99f95-default-rtdb.firebaseio.com/products.json?auth=$authToken');
     try {
       final response = await http.get(url);
       print(json.decode(response.body));
@@ -51,7 +53,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final url = Uri.parse(
-        'https://shop-app-99f95-default-rtdb.firebaseio.com/products.json');
+        'https://shop-app-99f95-default-rtdb.firebaseio.com/products.json?auth=$authToken');
     try {
       final response = await http.post(
         url,
@@ -91,7 +93,7 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((element) => id == element.id);
     final url = Uri.parse(
-        'https://shop-app-99f95-default-rtdb.firebaseio.com/products/$id.json');
+        'https://shop-app-99f95-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken');
     try {
       // patch request merges the incoming data with the existing data
       // and also overwrites the data it already has for a particular key
@@ -111,7 +113,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final url = Uri.parse(
-        'https://shop-app-99f95-default-rtdb.firebaseio.com/products/$id.json');
+        'https://shop-app-99f95-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken');
     final indexOfProd = _items.indexWhere((element) => id == element.id);
     // storing the item in a separate variable
     var prod = _items[indexOfProd];

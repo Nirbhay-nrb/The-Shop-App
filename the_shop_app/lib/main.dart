@@ -9,6 +9,7 @@ import 'package:the_shop_app/screens/cart_screen.dart';
 import 'package:the_shop_app/screens/edit_product_screen.dart';
 import 'package:the_shop_app/screens/orders_screen.dart';
 import 'package:the_shop_app/screens/product_detail_screen.dart';
+import 'package:the_shop_app/screens/products_overview_screen.dart';
 import 'package:the_shop_app/screens/user_products_screen.dart';
 
 void main() {
@@ -21,33 +22,48 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (ctx) => Products(),
+          create: (ctx) => Auth(),
         ),
+        ChangeNotifierProxyProvider<Auth, Products>(
+          update: (ctx, auth, previousProducts) => Products(
+            auth.token,
+            previousProducts == null ? [] : previousProducts.items,
+          ),
+          create: (ctx) => Products('', []),
+        ),
+        // proxy provider is used to rebuild a provider class using a previous provider
+        // in this case we are rebuilding the products class by auth provider
         ChangeNotifierProvider(
           create: (ctx) => Cart(),
         ),
-        ChangeNotifierProvider(
-          create: (ctx) => Orders(),
-        ),
-        ChangeNotifierProvider(
-          create: (ctx) => Auth(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          update: (ctx, auth, previousOrders) => Orders(
+            auth.token,
+            previousOrders == null ? [] : previousOrders.orders,
+          ),
+          create: (ctx) => Orders('', []),
         ),
       ],
-      child: MaterialApp(
-        title: 'MyShop',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
+      child: Consumer<Auth>(
+        // whenever auth changes, material app is rebuilt
+        // thus changing the homescreen accordingly
+        // if the user is authenticated or not
+        builder: (ctx, auth, _) => MaterialApp(
+          title: 'MyShop',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+          ),
+          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+          routes: {
+            AuthScreen.routeName: (ctx) => AuthScreen(),
+            ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+            CartScreen.routeName: (ctx) => CartScreen(),
+            OrdersScreen.routeName: (ctx) => OrdersScreen(),
+            UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
+            EditProductScreen.routeName: (ctx) => EditProductScreen(),
+          },
         ),
-        home: AuthScreen(),
-        routes: {
-          AuthScreen.routeName: (ctx) => AuthScreen(),
-          ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-          CartScreen.routeName: (ctx) => CartScreen(),
-          OrdersScreen.routeName: (ctx) => OrdersScreen(),
-          UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
-          EditProductScreen.routeName: (ctx) => EditProductScreen(),
-        },
       ),
     );
   }

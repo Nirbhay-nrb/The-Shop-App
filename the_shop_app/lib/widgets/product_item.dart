@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_shop_app/providers/auth.dart';
 import 'package:the_shop_app/providers/cart.dart';
 import 'package:the_shop_app/providers/product.dart';
 import 'package:the_shop_app/screens/product_detail_screen.dart';
@@ -41,7 +42,8 @@ class ProductItem extends StatelessWidget {
               // incase u dont have any child property then just give an underscore(_)
               onPressed: () async {
                 try {
-                  await product.toggleFavoriteStatus();
+                  final token = Provider.of<Auth>(context, listen: false).token;
+                  await product.toggleFavoriteStatus(token);
                 } catch (e) {
                   scaffold.showSnackBar(
                       SnackBar(content: Text('Couldn\'t update!')));
