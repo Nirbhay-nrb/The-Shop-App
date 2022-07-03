@@ -116,6 +116,8 @@ class _AuthCardState extends State<AuthCard>
     _heightAnimation = Tween<Size>(
       begin: Size(double.infinity, 260),
       end: Size(double.infinity, 320),
+      // size needs a width and a height, as the width remains same during the animation
+      // we have provided width as double.infinity
     ).animate(
       CurvedAnimation(
         parent: _controller,
@@ -214,16 +216,14 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8,
-      child: AnimatedBuilder(
-        animation: _heightAnimation,
-        builder: (ctx, ch) => Container(
-            // ch is a widget which will not be rebuilt whenever the animation occurs
-            height: _heightAnimation.value.height,
-            constraints:
-                BoxConstraints(minHeight: _heightAnimation.value.height),
-            width: deviceSize.width * 0.75,
-            padding: EdgeInsets.all(16.0),
-            child: ch),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+        height: _authmode == AuthMode.Signup ? 320 : 260,
+        constraints:
+            BoxConstraints(minHeight: _authmode == AuthMode.Signup ? 320 : 260),
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
