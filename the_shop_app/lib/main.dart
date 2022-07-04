@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_shop_app/helpers/custom_route.dart';
 import 'package:the_shop_app/providers/auth.dart';
 import 'package:the_shop_app/providers/cart.dart';
 import 'package:the_shop_app/providers/orders.dart';
@@ -54,9 +55,15 @@ class MyApp extends StatelessWidget {
         builder: (ctx, auth, _) => MaterialApp(
           title: 'MyShop',
           theme: ThemeData(
-            primarySwatch: Colors.purple,
-            accentColor: Colors.deepOrange,
-          ),
+              primarySwatch: Colors.purple,
+              accentColor: Colors.deepOrange,
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                // we cannot directly assign the CustomRoute
+                //because we need to provide a transition builder not a route
+                // so we add another class to helpers foldes CustomPageTransitionBuilder
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              })),
           home: auth.isAuth
               ? ProductsOverviewScreen()
               : FutureBuilder(
